@@ -70,7 +70,7 @@ function displayWarning(message) {
 // Function to ask for bot token with validation
 function askForToken() {
   displayHeader();
-  displayInfo('Please enter your Discord bot token below: Press Ctrl+Shift+V to Paste');
+  displayInfo('Please enter your Discord bot token below:');
   displayWarning('Keep your token secure and never share it publicly!');
   console.log();
   
@@ -107,6 +107,8 @@ function generateInviteLink(clientId) {
 // Function to start the bot with enhanced error handling
 async function startBot() {
   try {
+    // Clear terminal after token input
+    console.clear();
     console.log();
     displayInfo('Connecting to Discord...');
     
@@ -114,6 +116,7 @@ async function startBot() {
     await client.login(botToken);
     
   } catch (error) {
+    console.clear();
     console.log();
     displayError(`Failed to connect: ${error.message}`);
     
@@ -151,6 +154,9 @@ async function registerCommands() {
 
 // Enhanced ready event
 client.once('ready', async () => {
+  // Clear terminal for clean online display
+  console.clear();
+  
   console.log();
   log('╔══════════════════════════════════════╗', colors.green);
   log('║            🎉 BOT ONLINE!            ║', colors.green);
