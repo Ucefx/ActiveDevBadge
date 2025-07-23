@@ -1,4 +1,4 @@
-const { Client, GatewayIntentBits, REST, Routes } = require('discord.js');
+const { Client, GatewayIntentBits, REST, Routes, SlashCommandBuilder } = require('discord.js');
 const readline = require('readline');
 
 // Create readline interface for user input
@@ -17,6 +17,14 @@ const client = new Client({
 });
 
 let botToken = '';
+
+// Slash command definition
+const commands = [
+  new SlashCommandBuilder()
+    .setName('hello')
+    .setDescription('Get the active developer link and wait 24 hours')
+    .toJSON(),
+];
 
 // Function to ask for bot token
 function askForToken() {
@@ -56,11 +64,32 @@ async function startBot() {
   }
 }
 
+// Function to register slash commands
+async function registerCommands() {
+  try {
+    const rest = new REST({ version: '10' }).setToken(botToken);
+    
+    console.log('🔄 Registering slash commands...');
+    
+    await rest.put(
+      Routes.applicationCommands(client.user.id),
+      { body: commands }
+    );
+    
+    console.log('✅ Slash commands registered successfully!');
+  } catch (error) {
+    console.error('❌ Failed to register slash commands:', error);
+  }
+}
+
 // Event when bot is ready
-client.once('ready', () => {
+client.once('ready', async () => {
   console.log('✅ Bot is online!');
   console.log(`📋 Logged in as: ${client.user.tag}`);
   console.log(`🆔 Bot ID: ${client.user.id}`);
+  
+  // Register slash commands
+  await registerCommands();
   
   // Generate and display invite link
   const inviteLink = generateInviteLink(client.user.id);
@@ -69,19 +98,17 @@ client.once('ready', () => {
   console.log(inviteLink);
   console.log('\nCopy this link to invite the bot to your server!');
   console.log('\n💡 Available Commands:');
-  console.log('- Type "?hello" in any channel to get a response!');
+  console.log('- Use "/hello" slash command to get the active developer link!');
   console.log('\n⚡ Bot is now running and ready to receive commands...');
 });
 
-// Event listener for messages
-client.on('messageCreate', (message) => {
-  // Ignore messages from bots
-  if (message.author.bot) return;
+// Event listener for slash commands
+client.on('interactionCreate', async (interaction) => {
+  if (!interaction.isChatInputCommand()) return;
   
-  // Check if message content is "hello" (case insensitive)
-  if (message.content.toLowerCase() === '?hello') {
-    message.reply('hellooo! 👋');
-    console.log(`📨 Replied to ${message.author.tag} in #${message.channel.name}`);
+  if (interaction.commandName === 'hello') {
+    await interaction.reply('https://discord.com/developers/active-developer\n\nWait 24 hours! ⏰');
+    console.log(`📨 Replied to ${interaction.user.tag} with active developer link`);
   }
 });
 

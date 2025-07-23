@@ -1,5 +1,8 @@
 run = "npm start"
 
+[env]
+REPL_SLUG = "discord-bot-replit"
+
 [nix]
 channel = "stable-22_11"
 
