@@ -1,4 +1,4 @@
-const { Client, GatewayIntentBits, REST, Routes, SlashCommandBuilder } = require('discord.js');
+const { Client, GatewayIntentBits, REST, Routes, SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const readline = require('readline');
 
 // Create readline interface for user input
@@ -18,22 +18,76 @@ const client = new Client({
 
 let botToken = '';
 
-// Slash command definition
+// Enhanced slash command definition
 const commands = [
   new SlashCommandBuilder()
     .setName('hello')
-    .setDescription('Get the active developer link and wait 24 hours')
+    .setDescription('Get the Discord Active Developer link and wait 24 hours')
     .toJSON(),
 ];
 
-// Function to ask for bot token
+// Utility functions
+const colors = {
+  reset: '\x1b[0m',
+  bright: '\x1b[1m',
+  red: '\x1b[31m',
+  green: '\x1b[32m',
+  yellow: '\x1b[33m',
+  blue: '\x1b[34m',
+  magenta: '\x1b[35m',
+  cyan: '\x1b[36m'
+};
+
+function log(message, color = colors.reset) {
+  console.log(`${color}${message}${colors.reset}`);
+}
+
+function displayHeader() {
+  console.clear();
+  log('╔══════════════════════════════════════╗', colors.cyan);
+  log('║        🤖 Discord Bot Setup          ║', colors.cyan);
+  log('║     Enhanced Active Developer Bot    ║', colors.cyan);
+  log('╚══════════════════════════════════════╝', colors.cyan);
+  console.log();
+}
+
+function displaySuccess(message) {
+  log(`✅ ${message}`, colors.green);
+}
+
+function displayError(message) {
+  log(`❌ ${message}`, colors.red);
+}
+
+function displayInfo(message) {
+  log(`ℹ️  ${message}`, colors.blue);
+}
+
+function displayWarning(message) {
+  log(`⚠️  ${message}`, colors.yellow);
+}
+
+// Function to ask for bot token with validation
 function askForToken() {
-  console.log('🤖 Discord Bot Setup');
-  console.log('====================');
-  rl.question('Please enter your Discord bot token: ', (token) => {
+  displayHeader();
+  displayInfo('Please enter your Discord bot token below:');
+  displayWarning('Keep your token secure and never share it publicly!');
+  console.log();
+  
+  rl.question('🔑 Bot Token: ', (token) => {
     if (!token || token.trim() === '') {
-      console.log('❌ Invalid token! Please try again.');
-      askForToken();
+      displayError('Invalid token! Token cannot be empty.');
+      console.log();
+      setTimeout(askForToken, 1500);
+      return;
+    }
+    
+    // Basic token format validation
+    const tokenPattern = /^[A-Za-z0-9._-]+$/;
+    if (!tokenPattern.test(token.trim())) {
+      displayError('Invalid token format! Please check your token.');
+      console.log();
+      setTimeout(askForToken, 1500);
       return;
     }
     
@@ -42,89 +96,192 @@ function askForToken() {
   });
 }
 
-// Function to generate invite link
+// Function to generate enhanced invite link
 function generateInviteLink(clientId) {
   const permissions = '2147483648'; // Send Messages permission
-  const inviteLink = `https://discord.com/api/oauth2/authorize?client_id=${clientId}&permissions=${permissions}&scope=bot`;
+  const scopes = 'bot%20applications.commands'; // Bot and slash commands
+  const inviteLink = `https://discord.com/api/oauth2/authorize?client_id=${clientId}&permissions=${permissions}&scope=${scopes}`;
   return inviteLink;
 }
 
-// Function to start the bot
+// Function to start the bot with enhanced error handling
 async function startBot() {
   try {
-    console.log('🚀 Starting bot...');
+    console.log();
+    displayInfo('Connecting to Discord...');
     
     // Login to Discord
     await client.login(botToken);
     
   } catch (error) {
-    console.error('❌ Failed to login:', error.message);
-    console.log('Please check your token and try again.');
-    askForToken();
+    console.log();
+    displayError(`Failed to connect: ${error.message}`);
+    
+    if (error.message.includes('TOKEN_INVALID')) {
+      displayError('The provided token is invalid!');
+    } else if (error.message.includes('DISALLOWED_INTENTS')) {
+      displayError('Bot intents are not properly configured in Discord Developer Portal!');
+    } else {
+      displayError('Please check your token and internet connection.');
+    }
+    
+    console.log();
+    displayInfo('Please try again with a valid token...');
+    setTimeout(askForToken, 2000);
   }
 }
 
-// Function to register slash commands
+// Function to register slash commands with better error handling
 async function registerCommands() {
   try {
     const rest = new REST({ version: '10' }).setToken(botToken);
     
-    console.log('🔄 Registering slash commands...');
+    displayInfo('Registering slash commands...');
     
     await rest.put(
       Routes.applicationCommands(client.user.id),
       { body: commands }
     );
     
-    console.log('✅ Slash commands registered successfully!');
+    displaySuccess('Slash commands registered successfully!');
   } catch (error) {
-    console.error('❌ Failed to register slash commands:', error);
+    displayError(`Failed to register slash commands: ${error.message}`);
   }
 }
 
-// Event when bot is ready
+// Enhanced ready event
 client.once('ready', async () => {
-  console.log('✅ Bot is online!');
-  console.log(`📋 Logged in as: ${client.user.tag}`);
-  console.log(`🆔 Bot ID: ${client.user.id}`);
+  console.log();
+  log('╔══════════════════════════════════════╗', colors.green);
+  log('║            🎉 BOT ONLINE!            ║', colors.green);
+  log('╚══════════════════════════════════════╝', colors.green);
+  console.log();
+  
+  displaySuccess(`Logged in as: ${client.user.tag}`);
+  displayInfo(`Bot ID: ${client.user.id}`);
+  displayInfo(`Serving ${client.guilds.cache.size} servers`);
+  console.log();
   
   // Register slash commands
   await registerCommands();
+  console.log();
   
-  // Generate and display invite link
+  // Generate and display enhanced invite link
   const inviteLink = generateInviteLink(client.user.id);
-  console.log('\n🔗 Invite Link:');
-  console.log('================');
-  console.log(inviteLink);
-  console.log('\nCopy this link to invite the bot to your server!');
-  console.log('\n💡 Available Commands:');
-  console.log('- Use "/hello" slash command to get the active developer link!');
-  console.log('\n⚡ Bot is now running and ready to receive commands...');
+  log('╔══════════════════════════════════════╗', colors.magenta);
+  log('║             🔗 INVITE LINK           ║', colors.magenta);
+  log('╚══════════════════════════════════════╝', colors.magenta);
+  console.log();
+  log(inviteLink, colors.cyan);
+  console.log();
+  
+  displayInfo('Copy the link above to invite the bot to your server!');
+  console.log();
+  
+  log('╔══════════════════════════════════════╗', colors.blue);
+  log('║            📋 COMMANDS               ║', colors.blue);
+  log('║  /hello - Get Active Developer Link  ║', colors.blue);
+  log('╚══════════════════════════════════════╝', colors.blue);
+  console.log();
+  
+  displaySuccess('Bot is ready and waiting for commands!');
+  log('Press Ctrl+C to stop the bot', colors.yellow);
 });
 
-// Event listener for slash commands
+// Enhanced slash command handler
 client.on('interactionCreate', async (interaction) => {
   if (!interaction.isChatInputCommand()) return;
   
   if (interaction.commandName === 'hello') {
-    await interaction.reply('https://discord.com/developers/active-developer\n\nWait 24 hours! ⏰');
-    console.log(`📨 Replied to ${interaction.user.tag} with active developer link`);
+    try {
+      // Create an enhanced embed response
+      const embed = new EmbedBuilder()
+        .setColor('#5865F2')
+        .setTitle('🎯 Discord Active Developer')
+        .setDescription('Click the link below to access the Discord Active Developer page!')
+        .addFields(
+          {
+            name: '🔗 Active Developer Link',
+            value: '[Click Here](https://discord.com/developers/active-developer)',
+            inline: false
+          },
+          {
+            name: '⏰ Important',
+            value: '**Wait 24 hours** after using the bot before claiming your badge!',
+            inline: false
+          },
+          {
+            name: '💡 Tip',
+            value: 'Make sure to use slash commands regularly to maintain active status.',
+            inline: false
+          }
+        )
+        .setFooter({ 
+          text: 'Discord Active Developer Program',
+          iconURL: 'https://cdn.discordapp.com/emojis/1234567890123456789.png'
+        })
+        .setTimestamp();
+
+      await interaction.reply({ embeds: [embed] });
+      
+      // Enhanced logging
+      const user = interaction.user;
+      const guild = interaction.guild;
+      log(`📨 Command executed by ${user.tag} (${user.id}) in ${guild ? guild.name : 'DM'}`, colors.green);
+      
+    } catch (error) {
+      displayError(`Failed to respond to command: ${error.message}`);
+      
+      // Fallback response
+      try {
+        await interaction.reply({
+          content: '🎯 **Discord Active Developer**\n\nhttps://discord.com/developers/active-developer\n\n⏰ **Wait 24 hours!**',
+          ephemeral: true
+        });
+      } catch (fallbackError) {
+        displayError(`Fallback response also failed: ${fallbackError.message}`);
+      }
+    }
   }
 });
 
-// Handle errors
+// Enhanced error handling
 client.on('error', (error) => {
-  console.error('❌ Bot error:', error);
+  displayError(`Bot error: ${error.message}`);
 });
 
-// Handle process termination
+client.on('warn', (warning) => {
+  displayWarning(`Bot warning: ${warning}`);
+});
+
+// Graceful shutdown
 process.on('SIGINT', () => {
-  console.log('\n👋 Shutting down bot...');
+  console.log();
+  log('╔══════════════════════════════════════╗', colors.yellow);
+  log('║          👋 SHUTTING DOWN            ║', colors.yellow);
+  log('╚══════════════════════════════════════╝', colors.yellow);
+  console.log();
+  
+  displayInfo('Disconnecting from Discord...');
   client.destroy();
   rl.close();
-  process.exit(0);
+  
+  setTimeout(() => {
+    displaySuccess('Bot shut down successfully!');
+    process.exit(0);
+  }, 1000);
+});
+
+// Handle uncaught exceptions
+process.on('uncaughtException', (error) => {
+  displayError(`Uncaught Exception: ${error.message}`);
+  console.error(error.stack);
+  process.exit(1);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  displayError(`Unhandled Rejection at: ${promise}, reason: ${reason}`);
 });
 
 // Start the application
-console.clear();
 askForToken();

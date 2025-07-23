@@ -1,81 +1,95 @@
-# Discord Bots for Replit
+# Discord Active Developer Bot
 
-Two Discord bots that work together: Bot 1 responds to slash commands, and Bot 2 automatically calls Bot 1 every 20 days.
+A clean, professional Discord bot that helps you maintain your Discord Active Developer status by providing the active developer link through slash commands.
 
-## Features
+## ✨ Features
 
-### Bot 1 (Main Bot)
-- 🤖 Interactive token input
-- 🔗 Automatic invite link generation
-- ⚡ Responds to "/hello" slash command with active developer link
-- ⚡ Runs perfectly on Replit
+- 🤖 **Interactive Setup** - Prompts for bot token with validation
+- 🔗 **Auto Invite Link** - Generates and displays invite link automatically  
+- ⚡ **Slash Commands** - Modern Discord slash command support
+- 🎨 **Rich Embeds** - Beautiful embedded responses with formatting
+- 🛡️ **Error Handling** - Comprehensive error handling and validation
+- 🎯 **Active Developer** - Helps maintain Discord Active Developer status
+- 🖥️ **Clean Interface** - Colorful console output with clear status messages
 
-### Bot 2 (Auto-caller Bot)
-- 🤖 Interactive token input for second bot
-- 🔗 Automatic invite link generation
-- 📅 Automatically calls Bot 1 every 20 days
-- ⏰ Scheduled using cron jobs
+## 🚀 Quick Start
 
-## Setup Instructions
-
-### Step 1: Create a Discord Application
+### Step 1: Create Discord Application
 1. Go to [Discord Developer Portal](https://discord.com/developers/applications)
-2. Create TWO applications (one for each bot)
-3. Go to the "Bot" section
-4. Click "Add Bot"
-5. Copy both bot tokens (keep them secret!)
+2. Click "New Application" and give it a name
+3. Go to the "Bot" section in the sidebar
+4. Click "Add Bot" 
+5. Copy the bot token (keep it secret!)
 
-### Step 2: Run Bot 1 on Replit
-1. Run Bot 1 with `npm start`
-2. Enter your first bot token when prompted
+### Step 2: Run on Replit
+1. Run the bot: `npm start`
+2. Paste your bot token when prompted
 3. Copy the generated invite link
-4. Use the invite link to add Bot 1 to your server
+4. Use the invite link to add the bot to your server
 
-### Step 3: Run Bot 2 on Replit
-1. Run Bot 2 with `node bot2.js`
-2. Enter your second bot token when prompted
-3. Enter the Guild ID where Bot 1 is located
-4. Enter the Channel ID where Bot 1 should be called
-5. Copy the generated invite link for Bot 2
-6. Use the invite link to add Bot 2 to your server
+### Step 3: Use the Bot
+- Use `/hello` slash command in any channel
+- Bot responds with the Discord Active Developer link
+- Wait 24 hours before claiming your badge!
 
-## Usage
+## 📋 Commands
 
-### Bot 1
-- Use `/hello` slash command in any channel where Bot 1 has access
-- Bot 1 will reply with the Discord Active Developer link and "Wait 24 hours!"
+| Command | Description | Response |
+|---------|-------------|----------|
+| `/hello` | Get Active Developer link | Rich embed with link and instructions |
 
-### Bot 2
-- Bot 2 runs automatically in the background
-- Every 20 days, it will automatically call Bot 1 with the `/hello` command
-- No manual interaction needed once set up
+## 🔧 Technical Details
 
-## Commands
+- **Framework**: Discord.js v14
+- **Commands**: Slash commands with auto-registration
+- **Permissions**: Send Messages + Use Slash Commands
+- **Intents**: Guilds, Guild Messages, Message Content
+- **Error Handling**: Comprehensive with fallback responses
 
-| Command | Response |
-|---------|----------|
-| `/hello` | Discord Active Developer link + "Wait 24 hours!" |
+## 🎨 Features Showcase
 
-## Files
+- **Colorful Console**: Beautiful colored output for better readability
+- **Input Validation**: Token format validation and error messages
+- **Rich Embeds**: Professional-looking embedded responses
+- **Graceful Shutdown**: Clean shutdown process with Ctrl+C
+- **Auto-Recovery**: Automatic retry on connection failures
 
-- `bot.js` - Main bot (Bot 1) that responds to slash commands
-- `bot2.js` - Auto-caller bot (Bot 2) that calls Bot 1 every 20 days
-- `package.json` - Dependencies and scripts
+## 🛡️ Security
 
-## Permissions Required
+- Token validation before connection attempts
+- Secure token handling (never logged or displayed)
+- Error messages don't expose sensitive information
+- Graceful handling of permission issues
 
-Both bots need the "Send Messages" permission to function properly.
-Bot 1 also needs "Use Slash Commands" permission.
+## 📱 Permissions Required
 
-## Schedule
+The bot needs these permissions to function:
+- **Send Messages** - To respond to commands
+- **Use Slash Commands** - To register and use slash commands
 
-Bot 2 is scheduled to call Bot 1 every 20 days at midnight (00:00).
-The schedule can be modified in the cron pattern in `bot2.js`.
+## 🔄 Active Developer Program
 
-## Troubleshooting
+This bot helps you maintain your Discord Active Developer status by:
+1. Providing easy access to the active developer link
+2. Encouraging regular bot usage through slash commands
+3. Reminding users to wait 24 hours before claiming
 
-- Make sure both bot tokens are correct
-- Ensure both bots have permission to read and send messages in the channels
-- Check that both bots are online in your server's member list
-- For Bot 2, make sure the Guild ID and Channel ID are correct
-- Bot 1 must be in the same server and channel that Bot 2 is configured to target
+## 🎯 Perfect for Replit
+
+- No external dependencies beyond Discord.js
+- Interactive token input (no environment variables needed)
+- Clean console output perfect for Replit's interface
+- Automatic invite link generation
+- One-command startup
+
+## 📞 Support
+
+If you encounter any issues:
+1. Check that your bot token is correct
+2. Ensure the bot has proper permissions in your server
+3. Verify the bot is online in your server's member list
+4. Make sure slash commands are enabled in your server
+
+---
+
+**Made for Discord Active Developer Program** 🎯
