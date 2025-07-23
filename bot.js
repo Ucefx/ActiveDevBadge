@@ -70,7 +70,7 @@ function displayWarning(message) {
 // Function to ask for bot token with validation
 function askForToken() {
   displayHeader();
-  displayInfo('Please enter your Discord bot token below:');
+  displayInfo('Please enter your Discord bot token below: Press Ctrl+Shift+V to Paste');
   displayWarning('Keep your token secure and never share it publicly!');
   console.log();
   
